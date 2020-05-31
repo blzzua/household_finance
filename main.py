@@ -14,11 +14,28 @@ class Main(tk.Frame):
     def init_main(self):
         toolbar = tk.Frame(bg='#d7d8e0', bd=2)
         toolbar.pack(side=tk.TOP, fill=tk.X)
-        account_text = f"{account.name}\n" \
-                       f"Баланс: {account.cur_balance}"
+        ttk_style = ttk.Style()
 
-        self.account_label = tk.Label(toolbar, text=account_text, font="Arial 20")
-        self.account_label.pack(side=tk.LEFT)
+        self.account_frame = ttk.Labelframe(toolbar, text=f'Баланс')
+        self.account_frame.grid_propagate(0)
+        self.account_frame.pack(side=tk.LEFT)
+        ##TODO растянуть по высоте
+        account_balance = f"{account.cur_balance}"
+        self.account_label = tk.Label(self.account_frame, text="Баланс:")
+        self.account_label.grid(column=0, row=0)
+
+        self.account_balance = tk.Label(self.account_frame, text=account_balance, font="Arial 20")
+        self.account_balance.grid(column=1, row=0)
+        accounts_name_list = [ _acc_name for _acc_id, _acc_name, _acc_bal in db.get_accounts_list() ]
+        self.accounts_list = ttk.Combobox(self.account_frame, values=accounts_name_list)
+        self.accounts_list.state(['readonly'])
+        self.accounts_list.grid(column=0, row=1, columnspan=2)
+        self.accounts_list.current(0)  ## define current
+
+        self.account_label.pack()
+        self.account_balance.pack()
+        self.accounts_list.pack()
+
 
         self.add_img = tk.PhotoImage(file='add.gif')
         btn_open_dialog = tk.Button(toolbar, text='Добавить\nпозицию', command=self.open_dialog, bg='#d7d8e0', bd=0,
@@ -44,6 +61,8 @@ class Main(tk.Frame):
         btn_refresh = tk.Button(toolbar, text='Обновить', bg='#d7d8e0', bd=0, image=self.refresh_img,
                                 compound=tk.TOP, command=self.view_records, width=70, wraplength=70)
         btn_refresh.pack(side=tk.LEFT)
+        #self.account_frame.configure(height=180)  #TODO: dirty yugly hack for fit label to height
+
 
         self.tree = ttk.Treeview(self, columns=('ID', 'description', 'type', 'total'), height=15, show='headings')
 
@@ -76,8 +95,8 @@ class Main(tk.Frame):
         JOIN accounts ON accounts.id=oper_log.acc_id and accounts.id= ? ; ''', (account.id,))
         [self.tree.delete(i) for i in self.tree.get_children()]
         [self.tree.insert('', 'end', values=row) for row in self.db.c.fetchall()]
-        account_text = f"{account.name}\nБаланс: {account.cur_balance}"
-        self.account_label.configure(text=account_text)
+        account_balance = f"{account.cur_balance}"
+        self.account_balance.configure(text=account_balance)
 
     def delete_records(self):
         for selection_item in self.tree.selection():
