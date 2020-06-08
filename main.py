@@ -73,14 +73,12 @@ class Main(tk.Frame):
 
     def context_menu_update(self, event):
         selection = self.tree.selection()
-        if "context_menu" in dir(self):
-            self.context_menu.destroy()
         if len(selection) > 0:
             self.context_menu = tk.Menu(self, tearoff=0)
             if len(selection) == 1:
                 self.context_menu.add_command(label="Изменить", command=self.open_update_dialog)
             self.context_menu.add_command(label="Удалить", command=self.delete_records)
-            self.context_menu.post(event.x_root, event.y_root)
+            self.context_menu.tk_popup(event.x_root, event.y_root)
 
     def records(self, description, costs, total):
         self.db.insert_data(description, costs, total)
