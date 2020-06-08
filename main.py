@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import sqlite3
+import webbrowser
 
 
 class Main(tk.Frame):
@@ -210,17 +211,21 @@ class AboutWindow(tk.Toplevel):
 
     def init_about(self):
         self.title('О программе')
-        self.geometry('420x150')
+        self.geometry('420x100+420+420')
         self.resizable(False, False)
         about_text = """HouseHold Finance. Программа для учета расходов.
-Пример программы с графическим интерфейсом на Tk
-https://www.youtube.com/channel/UCXE4vvggmw3gpu59D-QSLjA"""
+Пример программы с графическим интерфейсом на Tk"""
         #about_text_widget = tk.Message(self, text=about_text, width=50, height=3)
-        about_text_widget = tk.Message(self, text=about_text, width=400)
-
-        btn_ok = ttk.Button(self, text='Закрыть', command=self.destroy)
-        btn_ok.place(x=160, y=120)
+        about_text_widget = tk.Message(self, text=about_text, width=400, )
+        yt_link = tk.Label(self, text="Посетить youtube канал", fg="blue", cursor="hand2")
+        yt_link.bind("<Button-1>", lambda method: self.link_handler("https://www.youtube.com/channel/UCXE4vvggmw3gpu59D-QSLjA"))
         about_text_widget.pack()
+        yt_link.pack()
+        btn_ok = ttk.Button(self, text='Закрыть', command=self.destroy)
+        btn_ok.place(x=160, y=65)
+
+    def link_handler(self, url):
+        webbrowser.open(url)
 
 
 class DB:
