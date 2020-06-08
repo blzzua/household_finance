@@ -6,11 +6,20 @@ import sqlite3
 class Main(tk.Frame):
     def __init__(self, root):
         super().__init__(root)
+        self.parent = root
         self.init_main()
         self.db = db
         self.view_records()
 
     def init_main(self):
+        self.menubar = tk.Menu(self)
+        self.opermenu = tk.Menu(self.menubar, tearoff=0)
+        self.opermenu.add_command(label="Добавить позицию", command=self.open_dialog)
+        self.opermenu.add_command(label="Редактировать позицию", command=self.open_update_dialog)
+        self.opermenu.add_command(label="Удалить позицию" , command=self.delete_records)
+        self.menubar.add_cascade(label="Операции", menu=self.opermenu)
+
+        self.parent.config(menu=self.menubar)
         toolbar = tk.Frame(bg='#d7d8e0', bd=2)
         toolbar.pack(side=tk.TOP, fill=tk.X)
 
@@ -55,6 +64,7 @@ class Main(tk.Frame):
         self.scroll = tk.Scrollbar(self, orient = 'vertical', command = self.tree.yview)
         self.scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.tree.configure(yscrollcommand = self.scroll.set)
+
         
     def records(self, description, costs, total):
         self.db.insert_data(description, costs, total)
@@ -185,6 +195,8 @@ class Search(tk.Toplevel):
         btn_search.place(x=105, y=50)
         btn_search.bind('<Button-1>', lambda event: self.view.search_records(self.entry_search.get()))
         btn_search.bind('<Button-1>', lambda event: self.destroy(), add='+')
+
+
 
 
 class DB:
