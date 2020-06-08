@@ -17,7 +17,11 @@ class Main(tk.Frame):
         self.opermenu.add_command(label="Добавить позицию", command=self.open_dialog)
         self.opermenu.add_command(label="Редактировать позицию", command=self.open_update_dialog)
         self.opermenu.add_command(label="Удалить позицию" , command=self.delete_records)
+
+        self.helpmenu = tk.Menu(self.menubar, tearoff=0)
+        self.helpmenu.add_command(label="О программе", command=self.open_aboutwindow)
         self.menubar.add_cascade(label="Операции", menu=self.opermenu)
+        self.menubar.add_cascade(label="Помощь", menu=self.helpmenu)
 
         self.parent.config(menu=self.menubar)
         toolbar = tk.Frame(bg='#d7d8e0', bd=2)
@@ -102,6 +106,8 @@ class Main(tk.Frame):
     def open_search_dialog(self):
         Search()
 
+    def open_aboutwindow(self):
+        AboutWindow()
 
 class Child(tk.Toplevel):
     def __init__(self):
@@ -197,6 +203,24 @@ class Search(tk.Toplevel):
         btn_search.bind('<Button-1>', lambda event: self.destroy(), add='+')
 
 
+class AboutWindow(tk.Toplevel):
+    def __init__(self):
+        super().__init__()
+        self.init_about()
+
+    def init_about(self):
+        self.title('О программе')
+        self.geometry('420x150')
+        self.resizable(False, False)
+        about_text = """HouseHold Finance. Программа для учета расходов.
+Пример программы с графическим интерфейсом на Tk
+https://www.youtube.com/channel/UCXE4vvggmw3gpu59D-QSLjA"""
+        #about_text_widget = tk.Message(self, text=about_text, width=50, height=3)
+        about_text_widget = tk.Message(self, text=about_text, width=400)
+
+        btn_ok = ttk.Button(self, text='Закрыть', command=self.destroy)
+        btn_ok.place(x=160, y=120)
+        about_text_widget.pack()
 
 
 class DB:
