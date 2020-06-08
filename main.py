@@ -63,14 +63,25 @@ class Main(tk.Frame):
         self.tree.heading('description', text='Наименование')
         self.tree.heading('costs', text='Статья дохода/расхода')
         self.tree.heading('total', text='Сумма')
+        self.tree.bind('<Button-3>', self.context_menu_update)
 
         self.tree.pack(side=tk.LEFT)
 
-        self.scroll = tk.Scrollbar(self, orient = 'vertical', command = self.tree.yview)
+        self.scroll = tk.Scrollbar(self, orient='vertical', command=self.tree.yview)
         self.scroll.pack(side=tk.RIGHT, fill=tk.Y)
-        self.tree.configure(yscrollcommand = self.scroll.set)
+        self.tree.configure(yscrollcommand=self.scroll.set)
 
-        
+    def context_menu_update(self, event):
+        selection = self.tree.selection()
+        if "context_menu" in dir(self):
+            self.context_menu.destroy()
+        if len(selection) > 0:
+            self.context_menu = tk.Menu(self, tearoff=0)
+            if len(selection) == 1:
+                self.context_menu.add_command(label="Изменить", command=self.open_update_dialog)
+            self.context_menu.add_command(label="Удалить", command=self.delete_records)
+            self.context_menu.post(event.x_root, event.y_root)
+
     def records(self, description, costs, total):
         self.db.insert_data(description, costs, total)
         self.view_records()
@@ -84,7 +95,8 @@ class Main(tk.Frame):
     def view_records(self):
         self.db.c.execute('''SELECT * FROM finance''')
         [self.tree.delete(i) for i in self.tree.get_children()]
-        [self.tree.insert('', 'end', values=row) for row in self.db.c.fetchall()]
+        for row in self.db.c.fetchall():
+            self.tree.insert('', 'end', values=row)
 
     def delete_records(self):
         for selection_item in self.tree.selection():
