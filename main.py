@@ -64,14 +64,17 @@ class Main(tk.Frame):
         #self.account_frame.configure(height=180)  #TODO: dirty yugly hack for fit label to height
 
 
-        self.tree = ttk.Treeview(self, columns=('ID', 'description', 'type', 'total'), height=15, show='headings')
+        self.tree = ttk.Treeview(self, columns=('ID', 'rownumber', 'description', 'type', 'total'), height=15, show='headings')
+        self.tree["displaycolumns"] = ('rownumber', 'description', 'type', 'total')
 
-        self.tree.column('ID', width=30, anchor=tk.CENTER)
+        self.tree.column('ID')
+        self.tree.column('rownumber', width=30, anchor=tk.CENTER, stretch=tk.NO)
         self.tree.column('description', width=365, anchor=tk.CENTER)
         self.tree.column('type', width=150, anchor=tk.CENTER)
         self.tree.column('total', width=100, anchor=tk.CENTER)
 
         self.tree.heading('ID', text='ID')
+        self.tree.heading('rownumber', text='ID')
         self.tree.heading('description', text='Наименование')
         self.tree.heading('type', text='Статья дохода/расхода')
         self.tree.heading('total', text='Сумма')
@@ -90,11 +93,19 @@ class Main(tk.Frame):
 
     def view_records(self):
         account.recount()
-        self.db.c.execute('''SELECT oper_log.id, oper_log.description,  oper_log.type, oper_log.total 
+        self.db.c.execute('''SELECT oper_log.id, 
+            oper_log.description,  
+            oper_log.type, 
+            oper_log.total 
         FROM oper_log 
         JOIN accounts ON accounts.id=oper_log.acc_id and accounts.id= ? ; ''', (account.id,))
         [self.tree.delete(i) for i in self.tree.get_children()]
-        [self.tree.insert('', 'end', values=row) for row in self.db.c.fetchall()]
+        for _rownum, _row  in  enumerate(self.db.c.fetchall(), 1):
+            _id, _desc, _type, _total = _row
+            self.tree.insert('', 'end', values=(_id, _rownum, _desc, _type, _total), tags=(_type,))
+        self.tree.tag_configure(u'Доход', foreground='black')
+        self.tree.tag_configure(u'Расход', foreground='red')
+
         account_balance = f"{account.cur_balance}"
         self.account_balance.configure(text=account_balance)
 
