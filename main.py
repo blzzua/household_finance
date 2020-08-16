@@ -60,6 +60,7 @@ class Main(tk.Frame):
         self.refresh_img = tk.PhotoImage(file='refresh.gif')
         btn_refresh = tk.Button(toolbar, text='Обновить', bg='#d7d8e0', bd=0, image=self.refresh_img,
                                 compound=tk.TOP, command=self.view_records, width=70, wraplength=70)
+
         btn_refresh.pack(side=tk.LEFT)
         #self.account_frame.configure(height=180)  #TODO: dirty yugly hack for fit label to height
 
@@ -81,6 +82,7 @@ class Main(tk.Frame):
 
         self.tree.pack()
 
+
     def records(self, description, op_type, total):
         self.db.insert_data(description, op_type, total)
         self.view_records()
@@ -92,6 +94,7 @@ class Main(tk.Frame):
         self.view_records()
 
     def view_records(self):
+        print(f"debug: called view_records ")
         account.recount()
         self.db.c.execute('''SELECT oper_log.id, 
             oper_log.description,  
@@ -100,7 +103,7 @@ class Main(tk.Frame):
         FROM oper_log 
         JOIN accounts ON accounts.id=oper_log.acc_id and accounts.id= ? ; ''', (account.id,))
         [self.tree.delete(i) for i in self.tree.get_children()]
-        for _rownum, _row  in  enumerate(self.db.c.fetchall(), 1):
+        for _rownum, _row in enumerate(self.db.c.fetchall(), 1):
             _id, _desc, _type, _total = _row
             self.tree.insert('', 'end', values=(_id, _rownum, _desc, _type, _total), tags=(_type,))
         self.tree.tag_configure(u'Доход', foreground='black')
@@ -320,4 +323,7 @@ if __name__ == "__main__":
     root.title("Household finance")
     root.geometry("650x450+300+200")
     root.resizable(False, False)
+
+    root.bind('<F5>', lambda event: app.view_records() )
+
     root.mainloop()
