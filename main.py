@@ -80,6 +80,11 @@ class Main(tk.Frame):
         self.tree.heading('type', text='Статья дохода/расхода')
         self.tree.heading('total', text='Сумма')
 
+        root.bind('<F5>', lambda event: self.view_records())
+        root.bind('<Control-f>', lambda event: self.open_search_dialog())
+        root.bind('<Control-n>', lambda event: self.open_dialog())
+        root.bind('<Control-e>', lambda event: self.open_update_dialog())
+
         self.tree.pack()
 
 
@@ -94,7 +99,6 @@ class Main(tk.Frame):
         self.view_records()
 
     def view_records(self):
-        print(f"debug: called view_records ")
         account.recount()
         self.db.c.execute('''SELECT oper_log.id, 
             oper_log.description,  
@@ -323,7 +327,4 @@ if __name__ == "__main__":
     root.title("Household finance")
     root.geometry("650x450+300+200")
     root.resizable(False, False)
-
-    root.bind('<F5>', lambda event: app.view_records() )
-
     root.mainloop()
